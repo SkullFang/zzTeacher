@@ -4,7 +4,7 @@
 public class starttest {
 //
     public static void main(String[] args) {
-        new ServerComponent().start();
+        ServerComponent.StartThis();
     }
 
 }

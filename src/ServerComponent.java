@@ -1,7 +1,4 @@
 /**
- * Created by zhangyan on 2017/5/15.
- */
-/**
  * 注意：
  * 如果分成2个线程，发送的单个数据包就太大，而导致发送错误
  */
@@ -20,7 +17,7 @@ import javax.swing.JWindow;
  * 这是服务器端，就是屏幕信息的发送方
  */
 
-public class ServerComponent extends Thread
+public class ServerComponent implements Runnable
 {
     private int PORT = 9997;
     //定义了发送方发送数据包的编号最大值
@@ -60,7 +57,6 @@ public class ServerComponent extends Thread
             e.printStackTrace();
         }
     }
-
     /**
      * 此构造方法需要设定组播IP地址、端口号、发送图片最大序号、发送分的块数
      */
@@ -248,19 +244,21 @@ public class ServerComponent extends Thread
             }
         }
     }
-//
-//    public static void main(String []args)
-//    {
-//        new ServerComponent().start();
-//    }
-//    public void runn(ServerComponent sc){
-//        sc.sttt();
-//        sc.start();
-//    }
+
+    public static void main(String []args)
+    {
+        ServerComponent server = new ServerComponent();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+    }
+    public static void StartThis(){
+        ServerComponent server = new ServerComponent();
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+    }
+
 
 }
-
-
 /*
 class MyWindow extends JWindow
 {

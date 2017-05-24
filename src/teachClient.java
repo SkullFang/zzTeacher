@@ -23,6 +23,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JTextPane;
 
 
 public class teachClient extends JFrame {
@@ -58,6 +59,7 @@ public class teachClient extends JFrame {
 	BufferedWriter writer=null;
 	BufferedReader reader=null;
 	private JTextArea textArea;
+	private JTextField textField_1;
 	public teachClient() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 579, 452);
@@ -69,7 +71,7 @@ public class teachClient extends JFrame {
 		textField.setText("127.0.0.1");
 		textField.setColumns(10);
 		
-		JLabel lblNewLabel = new JLabel("请输入IP地址");
+		JLabel lblNewLabel = new JLabel("填写IP：");
 		
 		JButton button = new JButton("链接");
 		button.addMouseListener(new MouseAdapter() {
@@ -128,11 +130,10 @@ public class teachClient extends JFrame {
 			}
 		});
 		
-		JButton btnNewButton_1 = new JButton("ͬ同步屏幕");
+		JButton btnNewButton_1 = new JButton("ͬ查看学生屏幕");
 		btnNewButton_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-
 			}
 		});
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -143,12 +144,18 @@ public class teachClient extends JFrame {
 		JButton btnNewButton_2 = new JButton("查看学生屏幕");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				String sendmessage=textField_1.getText();
+				ChatManager.getChatManager().publish(null, sendmessage.toString());
 				rePad client=new rePad(7800,10,1);
 				client.setShowFrameVisible(true);
 				Thread clientThread=new Thread(client);
 				clientThread.start();
+
 			}
 		});
+		
+		textField_1 = new JTextField();
+		textField_1.setColumns(10);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -165,18 +172,19 @@ public class teachClient extends JFrame {
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_contentPane.createSequentialGroup()
 									.addGap(111)
-									.addComponent(button_3)
-									.addPreferredGap(ComponentPlacement.RELATED))
+									.addComponent(button_3))
 								.addGroup(gl_contentPane.createSequentialGroup()
 									.addGap(25)
-									.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(btnNewButton_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(button_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
-									.addPreferredGap(ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(textField_1)
+										.addComponent(button_1, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
+									.addGap(18)
 									.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 										.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)
-										.addComponent(btnNewButton_2, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE))
-									.addGap(18)))
+										.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+											.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+											.addComponent(btnNewButton_2, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)))))
+							.addPreferredGap(ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
 							.addComponent(panel, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 				.addGroup(gl_contentPane.createSequentialGroup()
@@ -199,10 +207,12 @@ public class teachClient extends JFrame {
 							.addComponent(btnNewButton))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(button_3)
-							.addGap(115)
+							.addGap(74)
+							.addComponent(btnNewButton_1)
+							.addGap(18)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnNewButton_1)
-								.addComponent(btnNewButton_2))
+								.addComponent(btnNewButton_2)
+								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addComponent(button_1)
