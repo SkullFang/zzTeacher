@@ -3,13 +3,13 @@
  * 如果分成2个线程，发送的单个数据包就太大，而导致发送错误
  */
 
+import apple.laf.JRSUIConstants;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import javax.swing.JWindow;
 
@@ -24,8 +24,8 @@ public class ServerComponent implements Runnable
     private int SEQMAX = 10;//发送图片最大序列号
     private int ImageBlockNumber = 4;//把图像分块：垂直方向分成ImageBlockNumber块
     private InetAddress multicastIA = null;//多播用的D类IP地址
-    private int sendInterval = 10;//表示间隔多长时间发送一张图片
-    private float compressRate = 0.5F;//画面的压缩比
+    private int sendInterval = 200;//表示间隔多长时间发送一张图片
+    private float compressRate = 0.2F;//画面的压缩比
     //--------上面是构造方法中可以更改的
 
     private Robot robot;
@@ -34,9 +34,13 @@ public class ServerComponent implements Runnable
     private InetAddress myaddress = null;//服务端本机IP地址
     private BufferedImage bufferedImage = null;
     private BufferedImage[] subImages = null;//这个是把bufferedImage分成份后存放
+    private BufferedImage[] sendhh=null;
     private int nowseq = -1;//当前发送的数据包图片的编号
     private boolean[] sendable = null;//用来标记发送线程当前是否可以发送
     private boolean toend;//用于终止发送各线程的控制信号
+
+    private int[] imageb;
+    private int[] test;
 
     /**
      * 默认构造方法
@@ -46,7 +50,7 @@ public class ServerComponent implements Runnable
     {
         try
         {
-            multicastIA = InetAddress.getByName("224.0.0.2");
+            multicastIA = InetAddress.getByName("224.0.0.1");
             PORT = 9997;
             SEQMAX = 10;
             ImageBlockNumber = 4;
@@ -85,20 +89,31 @@ public class ServerComponent implements Runnable
             sendable[i] = false;  //初始化为否
         myaddress = InetAddress.getLocalHost();//获得自己的ip
         toend = false;  //这是一个控制信号，用来控制结束发送。
+        sendhh =new BufferedImage[ImageBlockNumber];
+        test=new int[ImageBlockNumber];
+        for(int i=0;i<ImageBlockNumber;i++){
+            sendhh[i]=null;
+            test[i]=0;
+        }
     }
 
     /**
      * gainImage方法用来获取屏幕截图，并把截图分成ImageBlockNumber块
      */
-    private void gainImage()
-    {
+    private void gainImage() {
         Dimension screenDimension = toolkit.getScreenSize(); //用于封装对象组件的高度和宽度。
         int subHeight = screenDimension.height/ImageBlockNumber;//表示每块的高度
         bufferedImage = robot.createScreenCapture(new Rectangle(screenDimension));
         subImages = new BufferedImage[ImageBlockNumber];
+        imageb=new int[ImageBlockNumber];
+
         for(int i=0;i<ImageBlockNumber;i++)
         {
             subImages[i] = bufferedImage.getSubimage(0, i*subHeight, screenDimension.width, subHeight);
+
+
+//            imageb[i]=i;
+
         }// bufferedImage.getSubimage 方法c创建一个举行区域定义的子图像
     }
     /**
@@ -175,7 +190,7 @@ public class ServerComponent implements Runnable
      * 此类用来完成图片发送一块的任务，使用多线程
      * @author me
      */
-    private class Sender extends Thread
+    public class Sender extends Thread
     {
         /**
          * 此发送方的编号
@@ -184,6 +199,7 @@ public class ServerComponent implements Runnable
         /**
          * 此线程要发送的图片块
          */
+        private boolean flag=false;
         private BufferedImage subBufferedImage = null;
         private DatagramPacket packet = null;
         private MulticastSocket multicastSocket = null;//用于组播传送的
@@ -191,30 +207,54 @@ public class ServerComponent implements Runnable
         {
             this.senderNumber = senderNumber;
             multicastSocket = new MulticastSocket(PORT+senderNumber);//不同端口发送数据
-            multicastSocket.setSendBufferSize(409600); //设置buffer
+            multicastSocket.setSendBufferSize(809600); //设置buffer
             multicastSocket.joinGroup(multicastIA); //加入广播组
         }
+
         /**
          * 准备要发送的数据报文
          */
         public void prepareDatagram()//打包
         {
-            this.subBufferedImage = subImages[senderNumber];
-            ByteArrayOutputStream output=new ByteArrayOutputStream();//数据流
-            output.write(nowseq);//加入一个字节表示传送的是哪张图片
-            output.write(this.senderNumber);//加入一个字节表示传送的是图片中的哪个部分
-            //将位图格式的图片压缩成JPEG格式，以减少传输的数据量
-            JPEGEncodeParam param=JPEGCodec.getDefaultJPEGEncodeParam(subBufferedImage);
-            param.setQuality(compressRate,false);
-            JPEGImageEncoder encoder=JPEGCodec.createJPEGEncoder(output,param);
-            try
+//            if(imageb[senderNumber]!=test[senderNumber]){
+//                System.out.print("no");
+//                System.out.println(imageb[senderNumber]+test[senderNumber]);
+//                test[senderNumber]=imageb[senderNumber];
+//            }else{
+//                System.out.print("yes");
+//            }
+
+            if(subImages[senderNumber]!=this.subBufferedImage)
             {
-                encoder.encode(subBufferedImage);
-                encoder.getOutputStream().close();
-                packet = new DatagramPacket(output.toByteArray(),output.size(),multicastIA,PORT+senderNumber);
+
+//                System.out.println("打包成功");
+                this.subBufferedImage = subImages[senderNumber];
+                sendhh[senderNumber]=subImages[senderNumber];
+                ByteArrayOutputStream output = new ByteArrayOutputStream();//数据流
+
+
+                output.write(nowseq);//加入一个字节表示传送的是哪张图片
+                output.write(this.senderNumber);//加入一个字节表示传送的是图片中的哪个部分
+                //将位图格式的图片压缩成JPEG格式，以减少传输的数据量
+
+                JPEGEncodeParam param = JPEGCodec.getDefaultJPEGEncodeParam(subBufferedImage);
+                param.setQuality(compressRate, false);
+                JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(output, param);
+                try {
+                    encoder.encode(subBufferedImage);
+                    encoder.getOutputStream().close();
+                    System.out.println(output.size());
+                    packet = new DatagramPacket(output.toByteArray(), output.size(), multicastIA, PORT + senderNumber);
+                } catch (SocketException e) {
+                    System.err.println("Socket错误");
+                } catch (IOException e) {
+                    System.err.println("IO错误：可能是JPEG编码出现问题");
+                }
             }
-            catch(SocketException e){System.err.println("Socket错误");}
-            catch(IOException e){System.err.println("IO错误：可能是JPEG编码出现问题");}
+            else
+            {
+                System.out.println("一样就不发了");
+            }
         }
 
         public void run()
@@ -225,10 +265,30 @@ public class ServerComponent implements Runnable
                 {//可以发送
                     //准备数据包
                     prepareDatagram();
+                    flag=true;
+//                    for(int i=0;i<ImageBlockNumber;i++)
+//                    {
+////                        System.out.println("-----image----");
+////                        System.out.print(i);
+////                        System.out.println(subImages[i]);
+////                        System.out.println("-----image----");
+////                        System.out.println("*****sendhh****");
+////                        System.out.print(i);
+////                        System.out.println(sendhh[i]);
+////                        System.out.println("******sendhh*****");
+//                        if(subImages[i]!=sendhh[i]){
+//                            flag=true;
+//                            break;
+//                        }
+//                    }// bufferedImage.getSubimage 方法c创建一个举行区域定义的子图像
                     try
                     {//发送数据包
-                        multicastSocket.send(packet);
-                        System.out.println("线程"+this.senderNumber+"发送了");
+                        if(flag) {
+                            multicastSocket.send(packet);
+//                            System.out.println("线程" + this.senderNumber + "发送了");
+                        }else{
+                            System.out.println("一样的");
+                        }
                     }
                     catch(IOException e){System.err.println("发送线程"+senderNumber+"数据包发送异常");}
                     sendable[senderNumber] = false;

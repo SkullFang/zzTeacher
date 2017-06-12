@@ -121,12 +121,12 @@ public class teachClient extends JFrame {
 			}
 		});
 		
-		JButton button_3 = new JButton("\u663E\u793A\u5B66\u751F\u5C4F\u5E55");
+		JButton button_3 = new JButton("停止");
 		button_3.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				new ImageServer().start();
-			;
+				ChatManager.getChatManager().publish(null,"3");
+
 			}
 		});
 		
@@ -146,7 +146,7 @@ public class teachClient extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String sendmessage=textField_1.getText();
 				ChatManager.getChatManager().publish(null, sendmessage.toString());
-				rePad client=new rePad(7800,10,1);
+				rePad client=new rePad(7800,10,2);
 				client.setShowFrameVisible(true);
 				Thread clientThread=new Thread(client);
 				clientThread.start();

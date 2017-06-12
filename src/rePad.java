@@ -198,11 +198,11 @@ public class rePad implements Runnable{
         }
     }
 
-//    public static void main(String[] args) {
-//        rePad client=new rePad(7800,10,1);
-//        client.setShowFrameVisible(true);
-//        Thread clientThread=new Thread(client);
-//        clientThread.start();
-//    }
+    public static void main(String[] args) {
+        rePad client=new rePad(7800,10,2);
+        client.setShowFrameVisible(true);
+        Thread clientThread=new Thread(client);
+        clientThread.start();
+    }
 
 }
