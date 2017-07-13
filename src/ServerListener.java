@@ -21,6 +21,7 @@ public class ServerListener extends Thread {
 //		this.ipList = ipList;
 //	}
 	StringBuilder builder=new StringBuilder();
+	ArrayList<Socket> soketList=new ArrayList<>();
 	@Override
 	public void run() {
 		BufferedWriter writer;
@@ -32,13 +33,17 @@ public class ServerListener extends Thread {
 				//block
 				Socket socket = serverSocket.accept();
 				writer=new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-				JOptionPane.showMessageDialog(null, "�пͻ�������\n");
+//				JOptionPane.showMessageDialog(null, "有客户端链接\n");
 				InetAddress student=socket.getInetAddress();
 				builder.append(student.toString()+"\n");
+				soketList.add(socket);
 				ChatSocket cs = new ChatSocket(socket);
 				cs.start();
 				ChatManager.getChatManager().add(cs);
-				new teachClient().sendbuilder(builder);
+				teachClient tc=new teachClient();
+//				new teachClient().sendbuilder(builder);
+				tc.sendbuilder(builder);
+				tc.sendSocket(soketList);
 			}
 			
 		} catch (IOException e) {

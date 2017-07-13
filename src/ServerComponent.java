@@ -50,7 +50,7 @@ public class ServerComponent implements Runnable
     {
         try
         {
-            multicastIA = InetAddress.getByName("224.0.0.1");
+            multicastIA = InetAddress.getByName("224.4.4.1");
             PORT = 9997;
             SEQMAX = 10;
             ImageBlockNumber = 4;

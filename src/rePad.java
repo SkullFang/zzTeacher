@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -25,8 +27,8 @@ public class rePad implements Runnable{
 
     private static Image image=null;
     private int subHeight=0;
-    private int imageHeight=1280;
-    private int imageWidth=800;
+    private int imageHeight=800;
+    private int imageWidth=1280;
     private int nowseq=-1;
     private JFrame showFrame=null;
     private ShowPanel showPanel=null;
@@ -46,7 +48,7 @@ public class rePad implements Runnable{
         showFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         CloseWindowAdapter cwadapter = new CloseWindowAdapter();
         showFrame.addWindowListener(cwadapter);
-        showFrame.setSize(800,2000);
+        showFrame.setSize(1000,1500);
         showPanel=new ShowPanel();
 //        Dimension ds=showPanel.getPerferredSize();
 //        subHeight=ds.height;
@@ -159,7 +161,7 @@ public class rePad implements Runnable{
 
         public Receiver(int senderNumber) throws SocketException {
             this.senderNumber=senderNumber;
-            socket=new DatagramSocket(7800);
+            socket=new DatagramSocket(7899);
             socket.setReceiveBufferSize(409600);
             socket.setSoTimeout(2000);
         }
@@ -172,10 +174,13 @@ public class rePad implements Runnable{
                     packet=new DatagramPacket(bytes,bytes.length);
                     socket.receive(packet);
                     ByteArrayInputStream input=new ByteArrayInputStream(packet.getData(),packet.getOffset(),packet.getLength());
+                    FileOutputStream fops=new FileOutputStream("now_student.jpg");
+                    fops.write(packet.getData());
 //                    nowseq=input.read();
 //                    senderNumber=input.read();
-                    System.out.println(nowseq);
-                    System.out.println(senderNumber);
+                    System.out.println(socket.getInetAddress());
+//                    System.out.println(nowseq);
+//                    System.out.println(senderNumber);
                     image= ImageIO.read(input);
 
 //                    Dimension ds=showPanel.getPerferredSize();
@@ -199,7 +204,7 @@ public class rePad implements Runnable{
     }
 
     public static void main(String[] args) {
-        rePad client=new rePad(7800,10,2);
+        rePad client=new rePad(7899,10,2);
         client.setShowFrameVisible(true);
         Thread clientThread=new Thread(client);
         clientThread.start();

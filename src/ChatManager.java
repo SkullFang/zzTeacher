@@ -7,6 +7,7 @@ public class ChatManager {
 	public static ChatManager getChatManager() {
 		return cm;
 	}
+	public StringBuilder sb=new StringBuilder();
 	
 	Vector<ChatSocket> vector = new Vector<ChatSocket>();
 	
@@ -22,4 +23,5 @@ public class ChatManager {
 //			}
 		}
 	}
+
 }
