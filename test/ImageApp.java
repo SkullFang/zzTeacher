@@ -18,7 +18,7 @@ public class ImageApp extends JFrame {
         setSize(400, 300);
         setResizable(false);
         getContentPane().setLayout(null);
-        ImagePanel panel = new ImagePanel();
+        final ImagePanel panel = new ImagePanel();
         panel.setBounds(0, 0, 400, 300);
         getContentPane().add(panel);
         setVisible(true);

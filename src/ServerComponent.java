@@ -3,7 +3,7 @@
  * 如果分成2个线程，发送的单个数据包就太大，而导致发送错误
  */
 
-import apple.laf.JRSUIConstants;
+//import apple.laf.JRSUIConstants;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -25,7 +25,7 @@ public class ServerComponent implements Runnable
     private int ImageBlockNumber = 4;//把图像分块：垂直方向分成ImageBlockNumber块
     private InetAddress multicastIA = null;//多播用的D类IP地址
     private int sendInterval = 200;//表示间隔多长时间发送一张图片
-    private float compressRate = 0.2F;//画面的压缩比
+    private float compressRate = 0.02F;//画面的压缩比
     //--------上面是构造方法中可以更改的
 
     private Robot robot;
@@ -50,7 +50,7 @@ public class ServerComponent implements Runnable
     {
         try
         {
-            multicastIA = InetAddress.getByName("224.0.0.1");
+            multicastIA = InetAddress.getByName("224.4.4.1");
             PORT = 9997;
             SEQMAX = 10;
             ImageBlockNumber = 4;
@@ -143,7 +143,7 @@ public class ServerComponent implements Runnable
     /**
      * 修改压缩比
      */
-    public void setCompressRate(float rate)
+    public void set(float rate)
     {
         this.compressRate = rate;
     }
@@ -238,12 +238,12 @@ public class ServerComponent implements Runnable
                 //将位图格式的图片压缩成JPEG格式，以减少传输的数据量
 
                 JPEGEncodeParam param = JPEGCodec.getDefaultJPEGEncodeParam(subBufferedImage);
-                param.setQuality(compressRate, false);
+                param.setQuality(0.2f, false);
                 JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(output, param);
                 try {
                     encoder.encode(subBufferedImage);
                     encoder.getOutputStream().close();
-                    System.out.println(output.size());
+                    System.out.println("output.size"+output.size());
                     packet = new DatagramPacket(output.toByteArray(), output.size(), multicastIA, PORT + senderNumber);
                 } catch (SocketException e) {
                     System.err.println("Socket错误");

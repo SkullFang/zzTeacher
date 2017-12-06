@@ -21,31 +21,52 @@ public class ServerListener extends Thread {
 //		this.ipList = ipList;
 //	}
 	StringBuilder builder=new StringBuilder();
+	ArrayList<ChatSocket> soketList=new ArrayList<>();
 	@Override
 	public void run() {
+		System.out.println("server start");
 		BufferedWriter writer;
 		//1-65535
 		try {
 			ServerSocket serverSocket = new ServerSocket(12370);
 			new ImageServer().getServerSocket(serverSocket);
+
 			while (true) {
 				//block
 				Socket socket = serverSocket.accept();
+//				String iphand=socket.getInetAddress().toString().trim();
+//				String ip=iphand.substring(1,iphand.length());
+//				getMac.getMacAddress(ip);
+
+
+
 				writer=new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-				JOptionPane.showMessageDialog(null, "�пͻ�������\n");
+//				JOptionPane.showMessageDialog(null, "有客户端链接\n");
 				InetAddress student=socket.getInetAddress();
 				builder.append(student.toString()+"\n");
+
 				ChatSocket cs = new ChatSocket(socket);
 				cs.start();
 				ChatManager.getChatManager().add(cs);
-				new teachClient().sendbuilder(builder);
+				teachClient tc=new teachClient();
+				soketList.add(cs);
+
+//				new teachClient().sendbuilder(builder);
+				tc.sendbuilder(builder);
+				tc.sendSocket(soketList);
 			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
+	public static void main(String[] args) {
+		new ServerListener().start();
+	}
+
+
+
 }

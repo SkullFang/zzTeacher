@@ -7,11 +7,15 @@ public class ChatManager {
 	public static ChatManager getChatManager() {
 		return cm;
 	}
+	public StringBuilder sb=new StringBuilder();
 	
 	Vector<ChatSocket> vector = new Vector<ChatSocket>();
 	
 	public void add(ChatSocket cs) {
 		vector.add(cs);
+	}
+	public void remove(ChatSocket cs){
+		vector.remove(cs);
 	}
 	
 	public void publish(ChatSocket cs,String out) {
@@ -21,5 +25,8 @@ public class ChatManager {
 				csChatSocket.out(out);
 //			}
 		}
+	}
+
+	public void publish(String hh) {
 	}
 }
